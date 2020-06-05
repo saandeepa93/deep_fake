@@ -1,4 +1,5 @@
 import cv2
+import json
 
 
 
@@ -16,6 +17,13 @@ def imshow(img):
   cv2.imshow("image", img)
   cv2.waitKey(0)
   cv2.destroyAllWindows()
+
+
+def get_config(keys):
+  f = open('config.json')
+  config_data = json.load(f)
+  return config_data[keys]
+
 
 
 def reshape_tensor(img, gflag):
