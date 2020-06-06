@@ -5,7 +5,6 @@ from sys import exit as e
 
 
 class Unet(nn.Module):
-
   def contractor(self, in_channel, out_channel, kernel_size = (1, 3, 3), padding = (0, 1, 1)):
     block = torch.nn.Sequential(
       torch.nn.Conv3d(in_channels = in_channel, out_channels = out_channel, kernel_size = kernel_size,\
@@ -22,7 +21,6 @@ class Unet(nn.Module):
     c = abs(upsampled.size()[3] - encoder.size()[3])//2
     encoder = F.pad(encoder, (-c, -c, -c, -c), "constant", 0)
     return torch.cat((upsampled, encoder), 1)
-
 
 
   def expansion(self, in_channel, out_channel, kernel_size = (1, 3, 3), padding = (0, 1, 1)):

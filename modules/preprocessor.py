@@ -8,7 +8,10 @@ import torch
 import modules.utils as utils
 
 def read_data(input_path, gflag):
-  img_lst = []
+  source_lst = []
+  source_lst_rgb = []
+  driving_lst = []
+  driving_lst_rgb = []
   pro_path = utils.get_config("processed_path")
   img_size = utils.get_config("img_size")
   for folder in os.listdir(input_path):
@@ -17,10 +20,33 @@ def read_data(input_path, gflag):
       for files in tqdm(os.listdir(folder_path)):
         fpath = os.path.join(folder_path, files)
         if os.path.splitext(fpath)[1] == '.jpg':
-          img_lst.append(utils.imread(fpath, img_size, img_size, gflag))
-      img_arr = torch.from_numpy(np.array(img_lst)).unsqueeze(1).unsqueeze(2)
-      print(img_arr.shape)
-      save_path = os.path.join(pro_path, folder+".pt")
+          source_lst.append(utils.imread(fpath, img_size, img_size, gflag))
+          source_lst_rgb.append(utils.imread(fpath, img_size, img_size, 3))
+      img_arr = torch.from_numpy(np.array(source_lst)).unsqueeze(1).unsqueeze(2)
+      img_arr_rgb = torch.from_numpy(np.array(source_lst_rgb)).unsqueeze(1).permute(0, 4, 1, 2, 3)
+      print("source shape:", img_arr.shape, img_arr_rgb.size())
+      save_path = os.path.join(pro_path, "source.pt")
+      save_path_rgb = os.path.join(pro_path, "source_rgb.pt")
       torch.save(img_arr, save_path)
+      torch.save(img_arr, save_path_rgb)
+
+      cap = cv2.VideoCapture(os.path.join(input_path, 'facial_expression.mov'))
+      ret = True
+      while ret:
+        ret, frame = cap.read()
+        if ret:
+          frame_rgb = cv2.resize(frame, (img_size, img_size))
+          frame = cv2.resize(cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY), (img_size, img_size))
+          frame = cv2.normalize(frame, None, alpha = 0, beta = 1, norm_type = cv2.NORM_MINMAX, dtype = cv2.CV_32F)
+          driving_lst.append(frame)
+          driving_lst_rgb.append(frame_rgb)
+      driving_arr = torch.from_numpy(np.array(driving_lst)).unsqueeze(1).unsqueeze(2)
+      driving_arr_rgb = torch.from_numpy(np.array(driving_lst_rgb)).unsqueeze(1).permute(0, 4, 1, 2, 3)
+      save_path = os.path.join(pro_path, 'driving.pt')
+      save_path_rgb = os.path.join(pro_path, 'driving_rgb.pt')
+      torch.save(driving_arr, save_path)
+      torch.save(driving_arr, save_path_rgb)
+      print("driving shape:", driving_arr.size(), driving_arr_rgb.size())
+
 
       e()

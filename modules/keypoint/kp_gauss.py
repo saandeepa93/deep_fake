@@ -3,13 +3,13 @@ from torch import nn
 from sys import exit as e
 
 
-def get_grid_coordinates(heatmap_size, heatmap_type):
+def make_coordinate_grid(spatial_size, type):
     """
     Create a meshgrid [-1,1] x [-1,1] of given spatial_size.
     """
-    h, w = heatmap_size[:2]
-    x = torch.arange(w).type(heatmap_type)
-    y = torch.arange(h).type(heatmap_type)
+    h, w = spatial_size
+    x = torch.arange(w).type(type)
+    y = torch.arange(h).type(type)
 
     x = (2 * (x / (w - 1)) - 1)
     y = (2 * (y / (h - 1)) - 1)
@@ -22,9 +22,21 @@ def get_grid_coordinates(heatmap_size, heatmap_type):
 
 
 def kp_mean_var(heatmap):
-  mesh = get_grid_coordinates(heatmap.size(), heatmap.type())
-  heatmap = heatmap.unsqueeze(0).permute(3, 1, 2, 0)
-  mesh = mesh.unsqueeze(0)
+  mesh = make_coordinate_grid(heatmap.size()[3:], heatmap.type()).unsqueeze(0).unsqueeze(0).unsqueeze(0)
+  heatmap = heatmap.unsqueeze(-1) + 1e-7
+  mean = (heatmap * mesh).sum(dim = (3, 4))
 
-  mean = (heatmap * mesh).sum(dim = (1, 2))
-  print(mean)
+  var = mesh - mean.unsqueeze(-2).unsqueeze(-2)
+  #square and add another dimension for covariance
+  var = torch.matmul(var.unsqueeze(-1), var.unsqueeze(-2))
+  var = heatmap.unsqueeze(-1) * var
+  var = var.sum(dim = (3, 4))
+  kp = {"mean":mean.permute(0, 2, 1, 3), "var": var.permute(0, 2, 1, 3, 4)}
+  print(f"heatmap: {heatmap.size()}, mesh: {mesh.size()}, mean: {mean.size()},\
+    variance: {var.size()}")
+
+
+
+
+  e()
+
