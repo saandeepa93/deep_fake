@@ -35,8 +35,10 @@ class Unet(nn.Module):
 
 
 
-  def __init__(self, in_channel, out_channel):
+  def __init__(self, in_channel, out_channel, flag):
     super(Unet, self).__init__()
+    self.flag = flag
+
     self.encoder1 = self.contractor(in_channel = in_channel, out_channel = 64)
     self.encoder2 = self.contractor(64, 128)
     self.encoder3 = self.contractor(128, 256)
@@ -61,6 +63,10 @@ class Unet(nn.Module):
     encode_block3 = self.encoder3(encode_block2)
     encode_block4 = self.encoder4(encode_block3)
     encode_block5 = self.encoder5(encode_block4)
+
+    if self.flag == 1:
+      encoder_lst = [encode_block1, encode_block2, encode_block3, encode_block4, encode_block5]
+      return encoder_lst
 
     decode_block5 = F.interpolate(encode_block5, scale_factor = (1, 2, 2))
     decode_block5 = self.decoder5(decode_block5)

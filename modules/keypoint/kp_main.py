@@ -19,7 +19,7 @@ def show_sample(output_imgs, oflag):
 
 
 def generate_kp(gflag, oflag):
-  unet = Unet(gflag, oflag)
+  unet = Unet(gflag, oflag, 0)
   source = torch.load("./input/processed/source.pt")
   # driving = torch.load("./input/processed/driving.pt")
   # driving = driving[30:135,:,:,:,:]
@@ -28,8 +28,11 @@ def generate_kp(gflag, oflag):
   x = list(torch.split(x, 32, dim = 0))
   for src in x:
     output_imgs = unet(src)
+    # for enc in output_imgs:
+    #   print(enc.size())
     print(output_imgs.size())
-    # show_sample(output_imgs, oflag)
+    show_sample(output_imgs, oflag)
+    e()
     img_shape = output_imgs.size()
     output_imgs = output_imgs.view(img_shape[0], img_shape[1], img_shape[2], -1)
     output_imgs = F.softmax(output_imgs/0.1, dim = 3)

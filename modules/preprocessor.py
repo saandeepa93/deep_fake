@@ -8,6 +8,12 @@ import torch
 import modules.utils as utils
 
 def read_data(input_path, gflag):
+  """Extract Video frames from the input path and store in a tensor of format (N, C, D, H, W). create 2 pairs of tensor each for 1-channel and 3-channel.
+
+  Arguments:
+      input_path {string} -- Input path to fetch the videos/images
+      gflag {int} -- Channels of the input path (Typically 1). Also saves 3 channel tensors
+  """
   source_lst = []
   source_lst_rgb = []
   driving_lst = []

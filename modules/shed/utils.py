@@ -1,6 +1,31 @@
 from torch import nn
 import torch
 import torch.nn.functional as F
+import cv2
+
+
+def imread(path, m, n, gflag):
+  img = cv2.imread(path)
+  if (m != 0):
+    img = cv2.resize(img, (m,n))
+  if gflag == 1:
+    img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    img = cv2.normalize(img, None, alpha = 0, beta = 1, norm_type = cv2.NORM_MINMAX, dtype = cv2.CV_32F)
+  return img
+
+
+def imshow(img):
+  cv2.imshow("image", img)
+  cv2.waitKey(0)
+  cv2.destroyAllWindows()
+
+
+def get_config(keys):
+  f = open('config.json')
+  config_data = json.load(f)
+  return config_data[keys]
+
+
 
 
 

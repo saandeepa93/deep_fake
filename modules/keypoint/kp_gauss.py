@@ -18,7 +18,12 @@ def make_coordinate_grid(spatial_size, type):
     xx = x.view(1, -1).repeat(h, 1)
 
     meshed = torch.cat([xx.unsqueeze_(2), yy.unsqueeze_(2)], 2)
-    return meshed
+
+    d = torch.linspace(-1, 1, h)
+    meshx, meshy = torch.meshgrid((d, d))
+    grid = torch.stack((meshy, meshx), 2)
+    return grid
+
 
 
 def kp_mean_var(heatmap):
