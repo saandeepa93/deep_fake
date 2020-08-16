@@ -5,29 +5,32 @@ from sys import exit as e
 from tqdm import tqdm
 import torch
 
-import modules.utils as utils
+import modules.util as util
 
-def read_data(input_path, gflag):
+def read_data(configs):
   """Extract Video frames from the input path and store in a tensor of format (N, C, D, H, W). create 2 pairs of tensor each for 1-channel and 3-channel.
 
   Arguments:
       input_path {string} -- Input path to fetch the videos/images
       gflag {int} -- Channels of the input path (Typically 1). Also saves 3 channel tensors
   """
+  input_path = configs['paths']['input']
+  gflag = configs['image']['in_channel']
+  pro_path = configs['paths']['processed']
+  img_size = configs['image']['img_size']
+
   source_lst = []
   source_lst_rgb = []
   driving_lst = []
   driving_lst_rgb = []
-  pro_path = utils.get_config("processed_path")
-  img_size = utils.get_config("img_size")
   for folder in os.listdir(input_path):
     if folder.isnumeric():
       folder_path = os.path.join(input_path, folder)
       for files in tqdm(os.listdir(folder_path)):
         fpath = os.path.join(folder_path, files)
         if os.path.splitext(fpath)[1] == '.jpg':
-          source_lst.append(utils.imread(fpath, img_size, img_size, gflag))
-          source_lst_rgb.append(utils.imread(fpath, img_size, img_size, 3))
+          source_lst.append(util.imread(fpath, img_size, img_size, gflag))
+          source_lst_rgb.append(util.imread(fpath, img_size, img_size, 3))
       img_arr = torch.from_numpy(np.array(source_lst)).unsqueeze(1).unsqueeze(2)
       img_arr_rgb = torch.from_numpy(np.array(source_lst_rgb)).unsqueeze(1).permute(0, 4, 1, 2, 3)
       print("source shape:", img_arr.shape, img_arr_rgb.size())

@@ -1,16 +1,27 @@
 from sys import exit as e
 import numpy as np
+import yaml
+from sys import exit as e
+import click
 
-import modules.utils as utils
-from modules.keypoint.kp_main import generate_kp
-from modules.preprocessor import read_data
+import modules.util as util
+# from modules.preprocessor import read_data
+from modules.train import train_data
 
+
+@click.command()
+@click.option('--config', help = "path of config file")
+def train(config):
+  # read_data(configs)
+  configs = util.get_config(config)
+  train_data(configs)
+
+
+@click.group()
 def main():
-  in_channel = utils.get_config("in_channel")
-  out_channel = utils.get_config("out_channel")
-  input_path = utils.get_config("input_path")
-  # read_data(input_path, in_channel)
-  generate_kp(in_channel, out_channel)
+  pass
+
 
 if __name__ == '__main__':
+  main.add_command(train)
   main()

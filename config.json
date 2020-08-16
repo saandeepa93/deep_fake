@@ -1,7 +1,0 @@
-{
-  "input_path" : "./input/",
-  "processed_path" : "./input/processed/",
-  "in_channel" : 1,
-  "out_channel" : 10,
-  "img_size" : 64
-}

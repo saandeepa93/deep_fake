@@ -1,12 +1,16 @@
 .DS_Store
 .virtenv
+.venv
 .vscode
 
 __pycache__
 
-input/**
-models/**
-output/**
-artifacts/**
+input
+models
+output
+artifacts
+
 
 !.gitkeep
+
+.env
