@@ -7,6 +7,9 @@ from skimage.draw import circle
 import matplotlib.pyplot as plt
 import yaml
 
+import torch.nn.functional as F
+
+
 
 def draw_video_with_kp(video, kp_array, kp_size = 1, colormap = plt.get_cmap('gist_rainbow')):
   print("\nVisualizing keypoints")
@@ -76,5 +79,19 @@ def get_config(config_path):
   with open(config_path) as file:
     configs = yaml.load(file, Loader = yaml.FullLoader)
   return configs
+
+
+def crop_concat(upsampled, encoder):
+  c = abs(upsampled.size()[3] - encoder.size()[3])//2
+  encoder = F.pad(encoder, (-c, -c, -c, -c), "constant", 0)
+  return torch.cat((upsampled, encoder), 1)
+
+
+
+
+
+
+
+
 
 

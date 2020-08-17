@@ -12,3 +12,7 @@ hypers:
   out_channel: 10
   size: 128
   batch_size: 8
+  max_features: 512
+  num_blocks: 5
+  block_expansion: 32
+
