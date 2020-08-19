@@ -2,17 +2,29 @@ paths:
   input: ./input/BP4D/
   processed: ./input/processed/
 
-
 params:
   ext: .jpg
-  norm_const: 100
+
 
 hypers:
-  in_channel: 3
-  out_channel: 10
-  size: 128
-  batch_size: 8
-  max_features: 512
-  num_blocks: 5
-  block_expansion: 32
+  common:
+    in_channel: 3
+    out_channel: 10
+    size: 128
+    batch_size: 8
+    max_features: 512
+    num_blocks: 5
+    block_expansion: 32
+    kp_variance: matrix
+
+  generator_params:
+    num_refinement_block: 4
+    norm_const: 100
+    use_mask: True
+    mask_embedding_params:
+      use_heatmaps: True
+      use_deformed_source_image: True
+      heatmap_type: difference
+
+
 

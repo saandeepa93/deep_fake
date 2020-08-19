@@ -4,6 +4,7 @@ import torch.nn.functional as F
 from sys import exit as e
 
 from modules.unet import Hourglass
+import modules.util as util
 
 
 
@@ -18,6 +19,8 @@ def make_coordinate_grid(spatial_size, type):
     grid = torch.stack((meshy, meshx), 2)
     return grid
 
+def normalize_heatmap(heatmap, norm_const):
+  return heatmap/norm_const
 
 
 def kp_mean_var(heatmap):
@@ -38,6 +41,7 @@ def kp_mean_var(heatmap):
 
 
 def apply_gauss(kp, spatial_size):
+  print("kp driving: ", kp["mean"].size())
   mean = kp["mean"]
   num_leading_dims = len(mean.size()) - 1
   coord_grid = make_coordinate_grid(spatial_size, mean.type)
@@ -64,14 +68,11 @@ def apply_gauss(kp, spatial_size):
   return out
 
 
-
-
 class KeyPointDetector(nn.Module):
   def __init__(self, in_features, out_features, max_features, num_blocks, block_expansion):
     super(KeyPointDetector, self).__init__()
 
     self.hourglass = Hourglass(in_features, out_features, max_features, num_blocks, block_expansion)
-
 
   def forward(self, x):
     heatmap = self.hourglass(x)
