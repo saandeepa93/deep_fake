@@ -21,10 +21,12 @@ hypers:
     num_refinement_block: 4
     norm_const: 100
     use_mask: True
+    use_correction: True
     mask_embedding_params:
       use_heatmaps: True
       use_deformed_source_image: True
       heatmap_type: difference
+    num_group_blocks: 2
 
 
 

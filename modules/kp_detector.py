@@ -41,7 +41,6 @@ def kp_mean_var(heatmap):
 
 
 def apply_gauss(kp, spatial_size):
-  print("kp driving: ", kp["mean"].size())
   mean = kp["mean"]
   num_leading_dims = len(mean.size()) - 1
   coord_grid = make_coordinate_grid(spatial_size, mean.type)
@@ -76,8 +75,12 @@ class KeyPointDetector(nn.Module):
 
   def forward(self, x):
     heatmap = self.hourglass(x)
+    print("source image: ", x.size())
+    print("heatmap: ", heatmap.size())
+    e()
     img_shape = heatmap.size()
-    heatmap = F.softmax(heatmap/0.1, dim = 3)
+    heatmap = F.softmax(heatmap, dim = 3)
     heatmap = heatmap.view(*img_shape)
     kp_array = kp_mean_var(heatmap)
+    # util.visualize_kps(x, kp_array)
     return kp_array

@@ -12,6 +12,13 @@ class MovementEmbeddingModule(nn.Module):
     use_deformed_source_image = False, heatmap_type = "gaussian", add_bg_feature_maps = False,  use_difference=False):
     super(MovementEmbeddingModule, self).__init__()
 
+    # self.out_channels = (out_features + add_bg_feature_maps) * ((add_bg_feature_maps * (use_difference*2)) \
+    #   + (use_heatmaps * 3 + add_bg_feature_maps))
+
+    self.out_channels = (1 * use_heatmaps + 2 * use_difference + in_features * use_deformed_source_image) * (
+            out_features + add_bg_feature_maps)
+
+
     self.use_heatmaps = use_heatmaps
     self.norm_const = norm_const
     self.heatmap_type = heatmap_type
@@ -35,23 +42,23 @@ class MovementEmbeddingModule(nn.Module):
         zeros = torch.zeros(b, 1, 1, h, w).type(heatmap.type())
         heatmap = torch.cat([zeros, heatmap], dim = 2)
 
+
       heatmap = heatmap.unsqueeze(3)
       inputs.append(heatmap)
 
 
 
-      num_kp += self.add_bg_feat
+    num_kp += self.add_bg_feat
 
-      if self.use_difference or self.use_deformed_source_image:
-        kp_diff = (kp_driving["mean"] - kp_source["mean"])
-        if self.add_bg_feat:
-          zeros = torch.zeros(b, 1, 1, 2).type(kp_diff.type())
-          kp_diff = torch.cat([zeros, kp_diff], dim = 2)
-        kp_diff = kp_diff.view(b, 1, num_kp, 2, 1, 1).repeat(1, 1, 1, 1, h, w)
-        print("kp diff: ", kp_diff.size())
+    if self.use_difference or self.use_deformed_source_image:
+      kp_diff = (kp_driving["mean"] - kp_source["mean"])
+      if self.add_bg_feat:
+        zeros = torch.zeros(b, 1, 1, 2).type(kp_diff.type())
+        kp_diff = torch.cat([zeros, kp_diff], dim = 2)
+      kp_diff = kp_diff.view(b, 1, num_kp, 2, 1, 1).repeat(1, 1, 1, 1, h, w)
 
-      if self.use_difference:
-        inputs.append(kp_diff)
+    if self.use_difference:
+      inputs.append(kp_diff)
 
     if self.use_deformed_source_image:
       appearance_repeat = source_img.unsqueeze(1).unsqueeze(1).repeat(1, d, num_kp, 1, 1, 1, 1)

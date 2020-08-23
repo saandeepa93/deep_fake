@@ -28,6 +28,7 @@ def draw_video_with_kp(video, kp_array, kp_size = 1, colormap = plt.get_cmap('gi
 
 def visualize_kps(src, kp_array):
   test_img = src[:, :, 0, :, :].detach().permute(0, 2, 3, 1).numpy()
+  print(test_img.shape, kp_array['mean'][:, 0, :, :].detach().numpy().shape)
   draw_video_with_kp(test_img, kp_array['mean'][:, 0, :, :].detach().numpy())
 
 def matrix_inverse(batch_of_matrix, eps=0):

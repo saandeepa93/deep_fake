@@ -36,11 +36,14 @@ def train_data(configs):
   kp_variance = configs["hypers"]["common"]["kp_variance"]
   mask_embedding_params = configs["hypers"]["generator_params"]["mask_embedding_params"]
   norm_const = configs["hypers"]["generator_params"]["norm_const"]
+  num_group_blocks = configs["hypers"]["generator_params"]["num_group_blocks"]
+  use_mask = configs["hypers"]["generator_params"]["use_mask"]
+  use_correction = configs["hypers"]["generator_params"]["use_correction"]
 
 
   kp_detector = KeyPointDetector(in_features, out_features, max_features, num_block, block_expansion)
   generator = Generator(in_features, out_features, max_features, num_block, block_expansion,\
-    kp_variance, norm_const, **mask_embedding_params)
+    kp_variance, norm_const, num_group_blocks, use_mask, use_correction, **mask_embedding_params)
 
   for b, img in enumerate(dataloader, 0):
     img_size = img.size()
