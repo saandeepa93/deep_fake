@@ -10,6 +10,29 @@ import yaml
 import torch.nn.functional as F
 
 
+def viz_kps(heatmap, img, mean):
+
+  for j in range(heatmap.size(0)):
+    tmp_img = np.array(img[j, :, 0].permute(1, 2, 0).detach().numpy())
+    tmp_img = cv2.cvtColor(tmp_img, cv2.COLOR_BGR2RGB)
+    tmp_img_dr = np.array(img[j, :, 1].permute(1, 2, 0).detach().numpy())
+    tmp_img_dr = cv2.cvtColor(tmp_img_dr, cv2.COLOR_BGR2RGB)
+    for i in range(10):
+      x, y = mean[j, 0, i, 0].detach().numpy(), mean[j, 0, i, 1].detach().numpy()
+      new_x = np.interp(x, (mean.detach().numpy()[:, 0, :, 0].min(), mean.detach().numpy()[:, 0, :, 0].max()), (0, 128)).astype(np.int)
+      new_y = np.interp(y, (mean.detach().numpy()[:, 0, :, 1].min(), mean.detach().numpy()[:, 0, :, 1].max()), (0, 128)).astype(np.int)
+
+      x_dr, y_dr = mean[j, 1, i, 0].detach().numpy(), mean[j, 1, i, 1].detach().numpy()
+      new_x_dr = np.interp(x_dr, (mean.detach().numpy()[:, 1, :, 0].min(), mean.detach().numpy()[:, 1, :, 0].max()), (0, 128)).astype(np.int)
+      new_y_dr = np.interp(y_dr, (mean.detach().numpy()[:, 1, :, 1].min(), mean.detach().numpy()[:, 1, :, 1].max()), (0, 128)).astype(np.int)
+      # imshow(heatmap[0, i, 0].squeeze().detach().numpy())
+      cv2.circle(tmp_img, (new_x, new_y), 2, (255, 0, 0), 2)
+      cv2.circle(tmp_img_dr, (new_x_dr, new_y_dr), 2, (255, 0, 0), 2)
+    imshow(tmp_img)
+    imshow(tmp_img_dr)
+
+
+
 
 def draw_video_with_kp(video, kp_array, kp_size = 1, colormap = plt.get_cmap('gist_rainbow')):
   print("\nVisualizing keypoints")
@@ -28,7 +51,6 @@ def draw_video_with_kp(video, kp_array, kp_size = 1, colormap = plt.get_cmap('gi
 
 def visualize_kps(src, kp_array):
   test_img = src[:, :, 0, :, :].detach().permute(0, 2, 3, 1).numpy()
-  print(test_img.shape, kp_array['mean'][:, 0, :, :].detach().numpy().shape)
   draw_video_with_kp(test_img, kp_array['mean'][:, 0, :, :].detach().numpy())
 
 def matrix_inverse(batch_of_matrix, eps=0):

@@ -4,6 +4,7 @@ from sys import exit as e
 
 from modules.unet import Encoder
 from modules.densemotion import DenseMotionModule
+import modules.util as util
 
 class Generator(nn.Module):
   def __init__(self, in_features, out_features, max_features, num_blocks, block_expansion,\

@@ -50,6 +50,7 @@ def train_data(configs):
     img = img.view(-1, img_size[2], img_size[3], img_size[4], img_size[5]).permute(0, 2, 1, 3, 4)
     source_img = img[:, :, 0].unsqueeze(2)
     driving_img = img[:, :, 1].unsqueeze(2)
+
     kp = kp_detector(img)
     kp_split = split_kp(kp)
     predicted = generator(source_img, kp_split["kp_source"], kp_split["kp_driving"])

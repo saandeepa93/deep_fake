@@ -7,6 +7,8 @@ from modules.unet import Hourglass
 import modules.util as util
 
 
+import numpy as np
+import cv2
 
 def make_coordinate_grid(spatial_size, type):
     """
@@ -23,7 +25,9 @@ def normalize_heatmap(heatmap, norm_const):
   return heatmap/norm_const
 
 
-def kp_mean_var(heatmap):
+
+
+def kp_mean_var(heatmap, img):
   mesh = make_coordinate_grid(heatmap.size()[3:], heatmap.type()).unsqueeze(0).unsqueeze(0).unsqueeze(0)
   heatmap = heatmap.unsqueeze(-1) + 1e-7
 
@@ -75,12 +79,13 @@ class KeyPointDetector(nn.Module):
 
   def forward(self, x):
     heatmap = self.hourglass(x)
-    print("source image: ", x.size())
-    print("heatmap: ", heatmap.size())
-    e()
+    heatmap_viz = heatmap.clone()
     img_shape = heatmap.size()
-    heatmap = F.softmax(heatmap, dim = 3)
+    heatmap = heatmap.view(img_shape[0], img_shape[1], img_shape[2], -1)
+    heatmap = F.softmax(heatmap/0.1, dim = 3)
     heatmap = heatmap.view(*img_shape)
-    kp_array = kp_mean_var(heatmap)
-    # util.visualize_kps(x, kp_array)
+    kp_array = kp_mean_var(heatmap, x)
+    # util.viz_kps(heatmap_viz, x, kp_array["mean"])
+    util.visualize_kps(x, kp_array)
+    e()
     return kp_array

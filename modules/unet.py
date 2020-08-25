@@ -70,7 +70,7 @@ class Decoder(nn.Module):
 
 
     self.upblocks = nn.ModuleList(upblocks)
-    self.last_conv = nn.Conv3d(in_channels = 32, out_channels = out_features, kernel_size= (1, 3, 3),\
+    self.last_conv = nn.Conv3d(in_channels = 35, out_channels = out_features, kernel_size= (1, 3, 3),\
       padding = (0, 1, 1))
 
 
@@ -79,10 +79,11 @@ class Decoder(nn.Module):
     for block in self.upblocks:
       out = F.interpolate(out, scale_factor = (1, 2, 2))
       out = block(out)
-      if len(x) != 1:
-        out = util.crop_concat(out, x.pop())
-      else:
-        continue
+      out = torch.cat([out, x.pop()], dim = 1)
+      # if len(x) != 1:
+      #   out = util.crop_concat(out, x.pop())
+      # else:
+      #   continue
     out = self.last_conv(out)
     return out
 
